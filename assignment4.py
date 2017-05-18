@@ -24,11 +24,18 @@ def temp_print_to_file(data):
 def euclidean_distance(point1,point2):
 	total = 0;
 	for i in range(0, len(point1)):
-		total = total + pow((float(point1[i])+float(point2[i])),2);
+		total = total + pow((float(point1[i])-float(point2[i])),2);
 	total = math.sqrt(total)
 	return total
 
-
+def find_SSE(points,center):
+	error = 0.
+	for x in range(0,len(points)):
+		for y in range(0,len(points[x])):
+			for z in range(0, len(points[x][y])):
+				error = error + pow(float(points[x][y][z]) - float(center[x][z]),2);
+	return error;
+	
 def kmeans(data, k):
 	center = [];
 	
@@ -38,7 +45,7 @@ def kmeans(data, k):
 	while(do < 10):
 		print ("Start new iteration")
 		newcenter = [];
-		points = [];
+		points = []; 
 		change = 0
 		for i in range(0,k):
 			points.append([]);
@@ -53,17 +60,16 @@ def kmeans(data, k):
 					addto = y;
 			#print(addto);
 			points[addto].append(data[x]);
+		print("Error : " + str(find_SSE(points,center)))
+		for x in range (0,k):
+			print(len(points[x]))
 		
-		#print (len(points[1]));
-		temp_print_to_file(points)
+		#temp_print_to_file(points)
 		for x in range(0, k):
-			TotalInArea = []
-			for i in range(0,784):
-				TotalInArea.append(0);
-			
+			TotalInArea = [0]*len(data[0])			
 			for y in range(0,len(points[x])):
 				for i in range(0,784):
-					TotalInArea[i] = TotalInArea[i] + int(points[x][y][i])
+					TotalInArea[i] = TotalInArea[i] + float(points[x][y][i])
 			for i in range(0,784):
 					newcenter[x].append(TotalInArea[i]/len(points[x]));
 
@@ -71,18 +77,19 @@ def kmeans(data, k):
 			similarity = 0
 			for y in range(0,784):
 				#print("newcenter = "+str(newcenter[x][y]))
-				#print("oldcenter = "+str(center[x][y]))
+				#print("oldcenter = "+str(center[x][y]))	
 				if(newcenter[x][y]-float(center[x][y])==0):
 					similarity= similarity + 1
 				#	print ("sim")
 			print (similarity)
-			if(similarity == 783):
+			if(similarity == 784):
 				change= change+1
-			print("change ="+str(change))
+			#print("change ="+str(change))
 		if (change == k):
 			return center
 		else:
 			center = newcenter
+
 
 if __name__ == "__main__":
 	data =  read_from_file();
