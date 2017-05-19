@@ -52,11 +52,6 @@ def kmeans(data, k):
 		#print (len(points[1]));
 		temp_print_to_file(points)
 		do = 1;
-			
-			
-				
-				
-				
 
 if __name__ == "__main__":
 	data =  read_from_file();
