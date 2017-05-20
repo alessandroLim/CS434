@@ -1,7 +1,7 @@
 import numpy as np
 import random as rand
-import math
-import csv
+import math, csv
+
 def read_from_file():
 	with open("data.txt", 'r') as f:
 		data = csv.reader(f);
@@ -96,7 +96,36 @@ def kmeans(data, k):
 		else:
 			center = newcenter
 
-def hac_single_link(dist, row, col):
+class Cluster:
+
+	def __init__(self, vec = [], lhs = None, rhs = None, dist = 0, node_id = None):
+		self.vec = vec
+		self.lhs, self.rhs = lhs, rhs
+		self.dist, self.node_id = dist, node_id
+# https://www.cnblogs.com/Key-Ky/p/3440684.html
+# https://nlp.stanford.edu/IR-book/html/htmledition/time-complexity-of-hac-1.html
+# http://bluewhale.cc/2016-04-19/hierarchical-clustering.html
+def hac_single_link(dist_vec, n):
+	clusters = [Cluster(vec = dist_vec[i], node_id = i) for i in range(len(dist_vec))]
+	dist_set = {}
+	tmp_pos, tmp_id = None, None
+	while len(clusters) > n:
+		min_dist = 999999999999999999999
+		for i in range(len(clusters) - 1):
+			for j in range(i + 1, len(clusters)):
+				ids = clusters[i].id, clusters[j].id
+				if dist_set.get(ids) == None: dist_set[ids] = euclidean_distance(ids[0], ids[1])
+				tmp_dist = euclidean_distance(ids[0], ids[1])
+				if tmp_dist < min_dist:
+					min_dist, tmp_pos = tmp_dist, (i, j)
+		lhs, rhs = tmp_pos
+		new_vec = [(clusters[lhs].vec[i] + clusters[rhs].vec[i]) / 2 for i in range(len(clusters[lhs].vec))]
+		new_cluster = Cluster(vec = new_vec, lhs = clusters[lhs], rhs = clusters[rhs], dist = min_dist, id = tmp_id)
+		clusters[lhs], clusters[rhs] = [], []
+		clusters.append(new_cluster)
+	return clusters
+
+def hac_single_dist(dist, row, col):
     rows, cols = dist.shape
     min_dist = 999999999999999999999
     for i in range(rows):
@@ -105,7 +134,7 @@ def hac_single_link(dist, row, col):
             if tmp_dist < min_dist: min_dist = tmp_dist
     return min_dist
 
-def hac_complete_link(dist, row, col):
+def hac_complete_dist(dist, row, col):
     rows, cols = dist.shape
     max_dist = 0
     for i in range(rows):
