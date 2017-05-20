@@ -96,6 +96,24 @@ def kmeans(data, k):
 		else:
 			center = newcenter
 
+def hac_single_link(dist, row, col):
+    rows, cols = dist.shape
+    min_dist = 999999999999999999999
+    for i in range(rows):
+        for j in range(cols):
+            tmp_dist = dist[row[i]][col[j]];
+            if tmp_dist < min_dist: min_dist = tmp_dist
+    return min_dist
+
+def hac_complete_link(dist, row, col):
+    rows, cols = dist.shape
+    max_dist = 0
+    for i in range(rows):
+        for j in range(cols):
+            tmp_dist = dist[row[i]][col[j]];
+            if tmp_dist > max_dist: max_dist = tmp_dist
+    return max_dist
+
 if __name__ == "__main__":
 	data =  read_from_file();
 	center = kmeans(data,2);
