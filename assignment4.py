@@ -58,11 +58,11 @@ def kmeans(data, k):
 				if(mindistance > euclidean_distance(center[y],data[x])):
 					mindistance = euclidean_distance(center[y],data[x])
 					addto = y;
-			#print(addto);
+			# print(addto);
 			points[addto].append(data[x]);
 
-		#print (len(points[0]));
-		#print (len(points[1]));
+		# print (len(points[0]));
+		# print (len(points[1]));
 		temp_print_to_file(points)
 		do = 1;
 
@@ -70,7 +70,7 @@ def kmeans(data, k):
 		for x in range (0,k):
 			print(len(points[x]))
 
-		#temp_print_to_file(points)
+		# temp_print_to_file(points)
 		for x in range(0, k):
 			TotalInArea = [0]*len(data[0])
 			for y in range(0,len(points[x])):
@@ -82,15 +82,15 @@ def kmeans(data, k):
 		for x in range(0, k):
 			similarity = 0
 			for y in range(0,784):
-				#print("newcenter = "+str(newcenter[x][y]))
-				#print("oldcenter = "+str(center[x][y]))
+				# print("newcenter = "+str(newcenter[x][y]))
+				# print("oldcenter = "+str(center[x][y]))
 				if(newcenter[x][y]-float(center[x][y])==0):
 					similarity= similarity + 1
-				#	print ("sim")
+					# print ("sim")
 			print (similarity)
 			if(similarity == 784):
 				change= change+1
-			#print("change ="+str(change))
+			# print("change ="+str(change))
 		if (change == k):
 			return center
 		else:
@@ -98,52 +98,51 @@ def kmeans(data, k):
 
 class Cluster:
 
-	def __init__(self, vec = [], lhs = None, rhs = None, dist = 0, node_id = None):
-		self.vec = vec
-		self.lhs, self.rhs = lhs, rhs
-		self.dist, self.node_id = dist, node_id
-# https://www.cnblogs.com/Key-Ky/p/3440684.html
-# https://nlp.stanford.edu/IR-book/html/htmledition/time-complexity-of-hac-1.html
-# http://bluewhale.cc/2016-04-19/hierarchical-clustering.html
-def hac_single_link(dist_vec, n):
-	clusters = [Cluster(vec = dist_vec[i], node_id = i) for i in range(len(dist_vec))]
-	dist_set = {}
-	tmp_pos, tmp_id = None, None
-	while len(clusters) > n:
-		min_dist = 999999999999999999999
-		for i in range(len(clusters) - 1):
-			for j in range(i + 1, len(clusters)):
-				ids = clusters[i].id, clusters[j].id
-				if dist_set.get(ids) == None: dist_set[ids] = euclidean_distance(ids[0], ids[1])
-				tmp_dist = euclidean_distance(ids[0], ids[1])
-				if tmp_dist < min_dist:
-					min_dist, tmp_pos = tmp_dist, (i, j)
-		lhs, rhs = tmp_pos
-		new_vec = [(clusters[lhs].vec[i] + clusters[rhs].vec[i]) / 2 for i in range(len(clusters[lhs].vec))]
-		new_cluster = Cluster(vec = new_vec, lhs = clusters[lhs], rhs = clusters[rhs], dist = min_dist, id = tmp_id)
-		clusters[lhs], clusters[rhs] = [], []
-		clusters.append(new_cluster)
-	return clusters
+	def __init__(self, data, id):
+		self.id = id
+		self.points.append(data)
+		self.dist = None
 
-def hac_single_dist(dist, row, col):
-    rows, cols = dist.shape
-    min_dist = 999999999999999999999
-    for i in range(rows):
-        for j in range(cols):
-            tmp_dist = dist[row[i]][col[j]];
-            if tmp_dist < min_dist: min_dist = tmp_dist
-    return min_dist
+def min_dist(fst, snd):
+	min_dist = 999999999999999999999
+	for i in range(len(fst)):
+		for j in range(len(snd)):
+			tmp_dist = euclidean_distance(fst[i], snd[j])
+			if tmp_dist < min_dist:
+				min_dist = tmp_dist
+	return min_dist
 
-def hac_complete_dist(dist, row, col):
-    rows, cols = dist.shape
-    max_dist = 0
-    for i in range(rows):
-        for j in range(cols):
-            tmp_dist = dist[row[i]][col[j]];
-            if tmp_dist > max_dist: max_dist = tmp_dist
-    return max_dist
+def max_dist(fst, snd):
+	max_dist = 0
+	for i in range(len(fst)):
+		for j in range(len(snd)):
+			tmp_dist = euclidean_distance(fst[i], snd[j])
+			if tmp_dist > max_dist:
+				max_dist = tmp_dist
+	return max_dist
+
+def merge_clusters(clusters):
+	print None
+
+def hac_single_link(clusters):
+	for i in range(len(clusters)):
+		for j in range(len(clusters[i + 1:])):
+			min_dist(clusters[i], clusters[j])
+
+c = [
+    [123,    312,     434,     4325,    345345],
+    [23124,  141241,  434234,  9837489, 34743],
+    [128937, 127,     12381,   424,     8945],
+    [323,    4348,    5040,    8189,    2348],
+    [51249,  42190,   2713,    2319,    4328],
+    [13957,  1871829, 8712847, 34589,   30945],
+    [1234,   45094,   23409,   13495,   348052],
+    [49853,  3847,    4728,    4059,    5389]
+]
 
 if __name__ == "__main__":
-	data =  read_from_file();
-	center = kmeans(data,2);
-	print(center)
+    data =  read_from_file();
+	# center = kmeans(data,2);
+	# print center
+    cluster, tree = hcluster(c, 4)
+    print tree
