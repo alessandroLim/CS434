@@ -103,31 +103,43 @@ class Cluster:
 		self.points.append(data)
 		self.dist = None
 
-def min_dist(fst, snd):
+def single_link_dist(clusters):
 	min_dist = 999999999999999999999
-	for i in range(len(fst)):
-		for j in range(len(snd)):
-			tmp_dist = euclidean_distance(fst[i], snd[j])
+	lhs, rhs = None, None
+	for i in range(len(clusters)):
+		for j in range(i + 1, len(clusters)):
+			tmp_dist = euclidean_distance(clusters[i], clusters[j])
 			if tmp_dist < min_dist:
 				min_dist = tmp_dist
-	return min_dist
+				lhs, rhs = i, j
+	return min_dist, lhs, rhs
 
-def max_dist(fst, snd):
+def complete_link_dist(clusters):
 	max_dist = 0
-	for i in range(len(fst)):
-		for j in range(len(snd)):
-			tmp_dist = euclidean_distance(fst[i], snd[j])
+	lhs, rhs = None, None
+	for i in range(len(clusters)):
+		for j in range(i + 1, len(clusters)):
+			tmp_dist = euclidean_distance(clusters[i], clusters[j])
 			if tmp_dist > max_dist:
 				max_dist = tmp_dist
-	return max_dist
+				lhs, rhs = i, j
+	return max_dist, lhs, rhs
 
-def merge_clusters(clusters):
-	print None
+def merge_clusters(fst, snd):
+	merge = []
+	for i in range(len(fst)):
+		merge.append((fst[i] + snd[i]) / 2)
+	return merge
 
 def hac_single_link(clusters):
-	for i in range(len(clusters)):
-		for j in range(len(clusters[i + 1:])):
-			min_dist(clusters[i], clusters[j])
+	while len(clusters) > 1:
+		min_dist, lhs, rhs = single_link_dist(clusters)
+		print '+++', min_dist, clusters[lhs], clusters[rhs]
+		new_cluster = merge_clusters(clusters[lhs], clusters[rhs])
+		del clusters[lhs]
+		del clusters[rhs - 1]
+		clusters.append(new_cluster)
+		print '***', clusters, len(clusters)
 
 c = [
     [123,    312,     434,     4325,    345345],
@@ -144,5 +156,4 @@ if __name__ == "__main__":
     data =  read_from_file();
 	# center = kmeans(data,2);
 	# print center
-    cluster, tree = hcluster(c, 4)
-    print tree
+    hac_single_link(c)
