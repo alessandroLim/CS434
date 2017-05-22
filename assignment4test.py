@@ -36,62 +36,62 @@ def find_SSE(points,center):
 				error = error + pow(float(points[x][y][z]) - float(center[x][z]),2);
 	return error;
 
-def kmeans(data, k):
+def kmeans(data, k, threshold):
 	center = [];
-
-	do = 0;
-	for i in range(0,k):
-			center.append(data[rand.randint(0, len(data))]);
-	while(do < 10):
-		print ("Start new iteration")
-		newcenter = [];
-		points = [];
-		change = 0
+	with open("result"+str(k)+".txt", "w") as f:
+		do = 0;
+		f.write("k = "+ str(k)+"\n");
 		for i in range(0,k):
-			points.append([]);
-			newcenter.append([]);
-		temp = data[0]
-		for x in range(0,len(data)):
-			addto = k+1;
-			mindistance = 999999999999999999999;
-			for y in range(0,k):
-				if(mindistance > euclidean_distance(center[y],data[x])):
-					mindistance = euclidean_distance(center[y],data[x])
-					addto = y;
-			# print(addto);
-			points[addto].append(data[x]);
-
-		# print (len(points[0]));
-		# print (len(points[1]));
-		temp_print_to_file(points)
-		do = 1
-		print("Error : " + str(find_SSE(points,center)))
-		# for x in range (0,k): print(len(points[x]))
-		# temp_print_to_file(points)
-		for x in range(0, k):
-			TotalInArea = [0]*len(data[0])
-			for y in range(0,len(points[x])):
+				center.append(data[rand.randint(0, len(data))]);
+		while(do < threshold):
+			newcenter = [];
+			points = []; 
+			change = 0
+			for i in range(0,k):
+				points.append([]);
+				newcenter.append([]);
+			temp = data[0]
+			for x in range(0,len(data)):
+				addto = k+1;
+				mindistance = 999999999999999999999;
+				for y in range(0,k):
+					if(mindistance > euclidean_distance(center[y],data[x])):
+						mindistance = euclidean_distance(center[y],data[x])
+						addto = y;
+				#print(addto);
+				points[addto].append(data[x]);
+			#print("Error : " + str(find_SSE(points,center)))
+			f.write(str(find_SSE(points,center)));
+			f.write("\n")
+			#for x in range (0,k):
+				#print(len(points[x]))
+			
+			#temp_print_to_file(points)
+			for x in range(0, k):
+				TotalInArea = [0]*len(data[0])			
+				for y in range(0,len(points[x])):
+					for i in range(0,784):
+						TotalInArea[i] = TotalInArea[i] + float(points[x][y][i])
 				for i in range(0,784):
-					TotalInArea[i] = TotalInArea[i] + float(points[x][y][i])
-			for i in range(0,784):
-					newcenter[x].append(TotalInArea[i]/len(points[x]));
+						newcenter[x].append(TotalInArea[i]/len(points[x]));
 
-		for x in range(0, k):
-			similarity = 0
-			for y in range(0,784):
-				# print("newcenter = "+str(newcenter[x][y]))
-				# print("oldcenter = "+str(center[x][y]))
-				if(newcenter[x][y]-float(center[x][y])==0):
-					similarity= similarity + 1
-					# print ("sim")
-			print (similarity)
-			if(similarity == 784):
-				change= change+1
-			# print("change ="+str(change))
-		if (change == k):
-			return center
-		else:
-			center = newcenter
+			for x in range(0, k):
+				similarity = 0
+				for y in range(0,784):
+					#print("newcenter = "+str(newcenter[x][y]))
+					#print("oldcenter = "+str(center[x][y]))	
+					if(newcenter[x][y]-float(center[x][y])==0):
+						similarity= similarity + 1
+					#	print ("sim")
+				#print (similarity)
+				if(similarity == 784):
+					change= change+1
+				#print("change ="+str(change))
+			if (change == k):
+				return center
+			else:
+				center = newcenter
+				do = do+1
 
 class Node:
 
@@ -163,7 +163,13 @@ def hac_single_link(clusters):
 	print ("============== Single Link HAC ==============")
 	for i in range(len(nodes)):
 		print (nodes[i].self_id)
-		
+	while len (nodes) > 1:
+		min_dist, lhs, rhs = single_link_dist(nodes, calc)
+		merge_cluster(nodes[lhs], nodes[rhs], min_dist)
+		del nodes[rhs]
+		print ("============================================")
+		for i in range(len(nodes)):
+			print (nodes[i].self_id, nodes[i].height)
 		
 
 
@@ -200,8 +206,8 @@ c = [
 '''
 if __name__ == "__main__":
 	data =  read_from_file()
-	#for i in range(2, 11):
-	#	print kmeans(data, i)
+	for i in range(2, 11):
+		kmeans(data, i, 1000000)
 	hac_single_link(data)
 	#hac_complete_link(data[:100])
 
