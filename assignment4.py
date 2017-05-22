@@ -4,9 +4,9 @@ import math, csv
 
 def read_from_file():
 	with open("data.txt", 'r') as f:
-		data = csv.reader(f);
-		data =  list(data);
-	return data;
+		data = csv.reader(f)
+		data =  list(data)
+	return data
 
 def temp_print_to_file(data):
 	with open("cluster.csv", "w") as f:
@@ -96,19 +96,19 @@ def kmeans(data, k):
 		else:
 			center = newcenter
 
-class Cluster:
+class Node:
 
-	def __init__(self, data, id):
-		self.id = id
-		self.points.append(data)
-		self.dist = None
+	def __init__(self, points, self_id, pair_id):
+		self.points = points
+		self.self_id = self_id
+		self.pair_id = pair_id
 
 def single_link_dist(clusters):
 	min_dist = 999999999999999999999
 	lhs, rhs = None, None
 	for i in range(len(clusters)):
 		for j in range(i + 1, len(clusters)):
-			tmp_dist = euclidean_distance(clusters[i], clusters[j])
+			tmp_dist = euclidean_distance(clusters[i].points, clusters[j].points)
 			if tmp_dist < min_dist:
 				min_dist = tmp_dist
 				lhs, rhs = i, j
@@ -125,21 +125,41 @@ def complete_link_dist(clusters):
 				lhs, rhs = i, j
 	return max_dist, lhs, rhs
 
-def merge_clusters(fst, snd):
-	merge = []
-	for i in range(len(fst)):
-		merge.append((fst[i] + snd[i]) / 2)
-	return merge
+def merge_cluster(fst_node, snd_node):
+	merge_node = []
+	for i in range(len(fst_node.points)):
+		merge_node.append((float(fst_node.points[i]) + float(snd_node.points[i])) / 2)
+	return merge_node
+
+def init_cluster(clusters):
+	nodes = []
+	for i, points in enumerate(clusters):
+		nodes.append(Node(points, str(i), None))
+	return nodes
 
 def hac_single_link(clusters):
-	while len(clusters) > 1:
-		min_dist, lhs, rhs = single_link_dist(clusters)
-		print '+++', min_dist, clusters[lhs], clusters[rhs]
-		new_cluster = merge_clusters(clusters[lhs], clusters[rhs])
-		del clusters[lhs]
-		del clusters[rhs - 1]
-		clusters.append(new_cluster)
-		print '***', clusters, len(clusters)
+	nodes = init_cluster(clusters)
+	while len(nodes) > 1:
+		min_dist, lhs, rhs = single_link_dist(nodes)
+		print '+++', min_dist, lhs, rhs
+		new_cluster = merge_cluster(nodes[lhs], nodes[rhs])
+		new_node = Node(new_cluster, str(lhs) + '-' + str(rhs), None)
+		del nodes[lhs]
+		del nodes[rhs - 1]
+		nodes.append(new_node)
+		print '***', nodes, len(nodes)
+
+def hac_complete_link(clusters):
+	nodes = init_cluster(clusters)
+	while len(nodes) > 1:
+		max_dist, lhs, rhs = complete_link_dist(nodes)
+		print '+++', max_dist, lhs, rhs
+		new_cluster = merge_cluster(nodes[lhs], nodes[rhs])
+		new_node = Node(new_cluster, str(lhs) + '-' + str(rhs), None)
+		del nodes[lhs]
+		del nodes[rhs - 1]
+		nodes.append(new_node)
+		print '***', nodes, len(nodes)
 
 c = [
     [123,    312,     434,     4325,    345345],
@@ -153,7 +173,7 @@ c = [
 ]
 
 if __name__ == "__main__":
-    data =  read_from_file();
+	data =  read_from_file()
 	# center = kmeans(data,2);
 	# print center
-    hac_single_link(c)
+	hac_single_link(c)
