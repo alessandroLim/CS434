@@ -98,9 +98,12 @@ class Node:
 	def __init__(self, points, self_id, pair_id):
 		self.points = points
 		self.self_id = self_id
-		self.pair_id = pair_id
+		self.height = height
 
-def single_link_dist(clusters):
+def get_distance(i,j, calc):
+
+		
+def single_link_dist(clusters, calc):
 	min_dist = 999999999999999999999
 	lhs, rhs = None, None
 	for i in range(len(clusters)):
@@ -124,23 +127,27 @@ def complete_link_dist(clusters):
 				lhs_id, rhs_id = clusters[i].self_id, clusters[j].self_id
 	return max_dist, lhs, rhs, lhs_id, rhs_id
 
-def merge_cluster(fst_node, snd_node):
+def merge_cluster(cluster1,cluster2):
 	merge_node = []
-	for i in range(len(fst_node.points)):
-		merge_node.append((float(fst_node.points[i]) + float(snd_node.points[i])) / 2)
-	return merge_node
+	for i in (len(cluster2.self_id)):
+		cluster1.points.append(cluster2.i
 
 def init_cluster(clusters):
 	nodes = []
-	for i, points in enumerate(clusters):
-		nodes.append(Node(points, str(i), None))
+	for i in range(len(clusters)):
+		nodes.append(Node([clusters[i]], [i], 0))
 	#print (nodes[0].points)
-	return nodes
+	calc = [];
+	for i in range(clusters):
+		calc.append();
+		for j in range(clusters):
+			calc[i].append(euclidean_distance(clusters[i],clusters[j]));
+	return nodes, calc
 
 def hac_single_link(clusters):
-	nodes = init_cluster(clusters)
+	nodes, calc = init_cluster(clusters)
 	while len(nodes) > 1:
-		min_dist, lhs, rhs, lhs_id, rhs_id = single_link_dist(nodes)
+		min_dist, lhs, rhs, lhs_id, rhs_id = single_link_dist(nodes, calc)
 		#print ('+++', min_dist, lhs, rhs)
 		new_cluster = merge_cluster(nodes[lhs], nodes[rhs])
 		#print (new_cluster)
@@ -152,6 +159,9 @@ def hac_single_link(clusters):
 	print ("============== Single Link HAC ==============")
 	for i in range(len(nodes)):
 		print (nodes[i], nodes[i].self_id)
+		
+def my_hac_single(data):
+
 
 def hac_complete_link(clusters):
 	nodes = init_cluster(clusters)
@@ -190,3 +200,6 @@ if __name__ == "__main__":
 		print kmeans(data, i)
 	hac_single_link(data[:100])
 	hac_complete_link(data[:100])
+
+	
+def my_hac_single
