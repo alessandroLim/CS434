@@ -70,6 +70,9 @@ def kmeans(data, k):
 		# temp_print_to_file(points)
 		for x in range(0, k):
 			TotalInArea = [0]*len(data[0])
+			if(len(points[x])==0):
+				for a in range(0,k):
+					print(len(points[a]))
 			for y in range(0,len(points[x])):
 				for i in range(0,784):
 					TotalInArea[i] = TotalInArea[i] + float(points[x][y][i])

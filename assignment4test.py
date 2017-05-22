@@ -8,6 +8,12 @@ def read_from_file():
 		data =  list(data)
 	return data
 
+def read_from_file1():
+	with open("data-1.txt", 'r') as f:
+		data = csv.reader(f)
+		data =  list(data)
+	return data
+
 def temp_print_to_file(data):
 	with open("cluster.csv", "w") as f:
 		f. write("cluster1\n")
@@ -69,6 +75,9 @@ def kmeans(data, k, threshold):
 			#temp_print_to_file(points)
 			for x in range(0, k):
 				TotalInArea = [0]*len(data[0])
+				if(len(points[x])==0):
+					for a in range(0,k):
+						print(len(points[a]), k)
 				for y in range(0,len(points[x])):
 					for i in range(0,784):
 						TotalInArea[i] = TotalInArea[i] + float(points[x][y][i])
@@ -156,7 +165,7 @@ def hac_single_link(clusters):
 		del nodes[rhs]
 	print ("============== Single Link HAC ==============")
 	for i in range(len(nodes)):
-		print nodes[i].self_id, nodes[i].height
+		print (nodes[i].self_id, nodes[i].height)
 
 def hac_complete_link(clusters):
 	nodes, calc = init_cluster(clusters)
@@ -166,7 +175,7 @@ def hac_complete_link(clusters):
 		del nodes[rhs]
 	print ("============== Complete Link HAC ==============")
 	for i in range(len(nodes)):
-		print nodes[i].self_id, nodes[i].height
+		print (nodes[i].self_id, nodes[i].height)
 
 c = [
 	    [123,    312,     434,     4325,   345345],
@@ -186,6 +195,7 @@ c = [
 '''
 if __name__ == "__main__":
 	data =  read_from_file()
+	data1 = read_from_file1()
 	for i in range(2, 11):
 		kmeans(data, i, 1000000)
 	hac_single_link(data)
