@@ -132,7 +132,8 @@ def complete_link_dist(clusters):
 	return max_dist, lhs, rhs, lhs_id, rhs_id
 
 def merge_cluster(cluster1,cluster2, min_dist):
-	for i in (0,len(cluster2.self_id)-1):
+	print(cluster2.self_id);
+	for i in range(len(cluster2.self_id)):
 		cluster1.points.append(cluster2.points[i]);
 		cluster1.self_id.append(cluster2.self_id[i]);
 	cluster1.height = min_dist
@@ -141,8 +142,6 @@ def init_cluster(clusters):
 	nodes = []
 	for i in range(len(clusters)):
 		nodes.append(Node([clusters[i]], [i], 0))
-		print(clusters[i]);
-		print(nodes[i]);
 	#print (nodes[0].points)
 	calc = [];
 	for i in range(len(clusters)):
@@ -163,7 +162,8 @@ def hac_single_link(clusters):
 		# print ('***', nodes, len(nodes))
 	print ("============== Single Link HAC ==============")
 	for i in range(len(nodes)):
-		print (len(nodes[i].points))
+		print (nodes[i].self_id)
+		
 		
 
 
