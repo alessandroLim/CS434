@@ -112,7 +112,8 @@ def single_link_dist(clusters):
 			if tmp_dist < min_dist:
 				min_dist = tmp_dist
 				lhs, rhs = i, j
-	return min_dist, lhs, rhs
+				lhs_id, rhs_id = clusters[i].self_id, clusters[j].self_id
+	return min_dist, lhs, rhs, lhs_id, rhs_id
 
 def complete_link_dist(clusters):
 	max_dist = 0
@@ -135,31 +136,37 @@ def init_cluster(clusters):
 	nodes = []
 	for i, points in enumerate(clusters):
 		nodes.append(Node(points, str(i), None))
+	#print (nodes[0].points)
 	return nodes
 
 def hac_single_link(clusters):
 	nodes = init_cluster(clusters)
 	while len(nodes) > 1:
-		min_dist, lhs, rhs = single_link_dist(nodes)
-		print '+++', min_dist, lhs, rhs
+		min_dist, lhs, rhs, lhs_id, rhs_id = single_link_dist(nodes)
+		#print ('+++', min_dist, lhs, rhs)
 		new_cluster = merge_cluster(nodes[lhs], nodes[rhs])
-		new_node = Node(new_cluster, str(lhs) + '-' + str(rhs), None)
+		#print (new_cluster)
+		new_node = Node(new_cluster, '('+lhs_id + '-' + rhs_id+')', None)
+		
 		del nodes[lhs]
 		del nodes[rhs - 1]
 		nodes.append(new_node)
-		print '***', nodes, len(nodes)
+		for i in range(0, len(nodes)):
+			print (nodes[i].points, nodes[i].self_id)
+		print ("================")
+		#print ('***', nodes, len(nodes))
 
 def hac_complete_link(clusters):
 	nodes = init_cluster(clusters)
 	while len(nodes) > 1:
 		max_dist, lhs, rhs = complete_link_dist(nodes)
-		print '+++', max_dist, lhs, rhs
+		#print ('+++', max_dist, lhs, rhs)
 		new_cluster = merge_cluster(nodes[lhs], nodes[rhs])
 		new_node = Node(new_cluster, str(lhs) + '-' + str(rhs), None)
 		del nodes[lhs]
 		del nodes[rhs - 1]
 		nodes.append(new_node)
-		print '***', nodes, len(nodes)
+		#print ('***', nodes, len(nodes))
 
 c = [
     [123,    312,     434,     4325,    345345],
