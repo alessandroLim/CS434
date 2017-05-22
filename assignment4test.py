@@ -100,9 +100,6 @@ class Node:
 		self.self_id = self_id
 		self.height = 0
 
-#def get_distance(i,j, calc):
-
-		
 def single_link_dist(clusters, calc):
 	min_dist = 999999999999999999999
 	lhs, rhs = None, None
@@ -116,33 +113,34 @@ def single_link_dist(clusters, calc):
 			if tmp_dist < min_dist:
 				min_dist = tmp_dist
 				lhs, rhs = i, j
-				lhs_id, rhs_id = i, j
 	return min_dist, lhs, rhs
 
-def complete_link_dist(clusters):
+def complete_link_dist(clusters, calc):
 	max_dist = 0
 	lhs, rhs = None, None
 	for i in range(len(clusters)):
 		for j in range(i + 1, len(clusters)):
-			tmp_dist = euclidean_distance(clusters[i].points, clusters[j].points)
+			tmp_dist = 0
+			for a in clusters[i].self_id:
+				for b in clusters[j].self_id:
+					if tmp_dist < calc[a][b]:
+						tmp_dist = calc[a][b]
 			if tmp_dist > max_dist:
 				max_dist = tmp_dist
 				lhs, rhs = i, j
-				lhs_id, rhs_id = clusters[i].self_id, clusters[j].self_id
-	return max_dist, lhs, rhs, lhs_id, rhs_id
+	return max_dist, lhs, rhs
 
 def merge_cluster(cluster1,cluster2, min_dist):
-	print(cluster2.self_id);
+	# print 'merge:', cluster2.self_id
 	for i in range(len(cluster2.self_id)):
-		cluster1.points.append(cluster2.points[i]);
-		cluster1.self_id.append(cluster2.self_id[i]);
+		cluster1.points.append(cluster2.points[i])
+		cluster1.self_id.append(cluster2.self_id[i])
 	cluster1.height = min_dist
-		
+
 def init_cluster(clusters):
 	nodes = []
 	for i in range(len(clusters)):
 		nodes.append(Node([clusters[i]], [i], 0))
-	#print (nodes[0].points)
 	calc = [];
 	for i in range(len(clusters)):
 		calc.append([]);
@@ -154,33 +152,21 @@ def hac_single_link(clusters):
 	nodes, calc = init_cluster(clusters)
 	while len(nodes) > 10:
 		min_dist, lhs, rhs = single_link_dist(nodes, calc)
-		#print ('+++', min_dist, lhs, rhs)
 		merge_cluster(nodes[lhs], nodes[rhs], min_dist)
-		#print (new_cluster)
 		del nodes[rhs]
-		#nodes.append(new_node)
-		# print ('***', nodes, len(nodes))
 	print ("============== Single Link HAC ==============")
 	for i in range(len(nodes)):
-		print (nodes[i].self_id)
-		
-		
-
+		print nodes[i].self_id, nodes[i].height
 
 def hac_complete_link(clusters):
-	nodes = init_cluster(clusters)
-	while len(nodes) > 1:
-		max_dist, lhs, rhs, lhs_id, rhs_id = complete_link_dist(nodes)
-		#print ('+++', max_dist, lhs, rhs)
-		new_cluster = merge_cluster(nodes[lhs], nodes[rhs])
-		new_node = Node(new_cluster, '('+lhs_id + '-' + rhs_id+')', None)
-		del nodes[lhs]
-		del nodes[rhs - 1]
-		nodes.append(new_node)
-		#print ('***', nodes, len(nodes))
+	nodes, calc = init_cluster(clusters)
+	while len(nodes) > 10:
+		max_dist, lhs, rhs = complete_link_dist(nodes, calc)
+		merge_cluster(nodes[lhs], nodes[rhs], max_dist)
+		del nodes[rhs]
 	print ("============== Complete Link HAC ==============")
 	for i in range(len(nodes)):
-		print (nodes[i], nodes[i].self_id)
+		print nodes[i].self_id, nodes[i].height
 
 c = [
 	    [123,    312,     434,     4325,   345345],
@@ -203,5 +189,4 @@ if __name__ == "__main__":
 	#for i in range(2, 11):
 	#	print kmeans(data, i)
 	hac_single_link(data)
-	#hac_complete_link(data[:100])
-
+	hac_complete_link(data)
