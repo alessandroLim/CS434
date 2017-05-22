@@ -116,7 +116,7 @@ def single_link_dist(clusters, calc):
 	return min_dist, lhs, rhs
 
 def complete_link_dist(clusters, calc):
-	max_dist = 0
+	max_dist = 999999999999999999999
 	lhs, rhs = None, None
 	for i in range(len(clusters)):
 		for j in range(i + 1, len(clusters)):
@@ -125,7 +125,7 @@ def complete_link_dist(clusters, calc):
 				for b in clusters[j].self_id:
 					if tmp_dist < calc[a][b]:
 						tmp_dist = calc[a][b]
-			if tmp_dist > max_dist:
+			if tmp_dist < max_dist:
 				max_dist = tmp_dist
 				lhs, rhs = i, j
 	return max_dist, lhs, rhs
@@ -150,23 +150,29 @@ def init_cluster(clusters):
 
 def hac_single_link(clusters):
 	nodes, calc = init_cluster(clusters)
-	while len(nodes) > 10:
+	while len(nodes) > 1:
 		min_dist, lhs, rhs = single_link_dist(nodes, calc)
 		merge_cluster(nodes[lhs], nodes[rhs], min_dist)
 		del nodes[rhs]
-	print ("============== Single Link HAC ==============")
-	for i in range(len(nodes)):
-		print nodes[i].self_id, nodes[i].height
+		if(len(nodes) == 10):
+			print ("============== Single Link HAC ==============")
+		if(len(nodes)<= 10):
+			for i in range(len(nodes)):
+				print(nodes[i].self_id, nodes[i].height)
+			print("==========next============");
 
 def hac_complete_link(clusters):
 	nodes, calc = init_cluster(clusters)
-	while len(nodes) > 10:
+	while len(nodes) > 1:
 		max_dist, lhs, rhs = complete_link_dist(nodes, calc)
 		merge_cluster(nodes[lhs], nodes[rhs], max_dist)
 		del nodes[rhs]
-	print ("============== Complete Link HAC ==============")
-	for i in range(len(nodes)):
-		print nodes[i].self_id, nodes[i].height
+		if(len(nodes) == 10):
+			print ("============== Complete Link HAC ==============")
+		if(len(nodes)<= 10):
+			for i in range(len(nodes)):
+				print(nodes[i].self_id, nodes[i].height)
+			print("==========next============");
 
 c = [
 	    [123,    312,     434,     4325,   345345],
@@ -188,5 +194,6 @@ if __name__ == "__main__":
 	data =  read_from_file()
 	for i in range(2, 11):
 		kmeans(data, i, 1000000)
+	data =  read_from_file()	
 	hac_single_link(data)
 	hac_complete_link(data)
