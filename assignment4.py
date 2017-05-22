@@ -64,12 +64,9 @@ def kmeans(data, k):
 		# print (len(points[0]));
 		# print (len(points[1]));
 		temp_print_to_file(points)
-		do = 1;
-
+		do = 1
 		print("Error : " + str(find_SSE(points,center)))
-		for x in range (0,k):
-			print(len(points[x]))
-
+		# for x in range (0,k): print(len(points[x]))
 		# temp_print_to_file(points)
 		for x in range(0, k):
 			TotalInArea = [0]*len(data[0])
@@ -120,11 +117,12 @@ def complete_link_dist(clusters):
 	lhs, rhs = None, None
 	for i in range(len(clusters)):
 		for j in range(i + 1, len(clusters)):
-			tmp_dist = euclidean_distance(clusters[i], clusters[j])
+			tmp_dist = euclidean_distance(clusters[i].points, clusters[j].points)
 			if tmp_dist > max_dist:
 				max_dist = tmp_dist
 				lhs, rhs = i, j
-	return max_dist, lhs, rhs
+				lhs_id, rhs_id = clusters[i].self_id, clusters[j].self_id
+	return max_dist, lhs, rhs, lhs_id, rhs_id
 
 def merge_cluster(fst_node, snd_node):
 	merge_node = []
@@ -147,26 +145,28 @@ def hac_single_link(clusters):
 		new_cluster = merge_cluster(nodes[lhs], nodes[rhs])
 		#print (new_cluster)
 		new_node = Node(new_cluster, '('+lhs_id + '-' + rhs_id+')', None)
-		
 		del nodes[lhs]
 		del nodes[rhs - 1]
 		nodes.append(new_node)
-		for i in range(0, len(nodes)):
-			print (nodes[i].points, nodes[i].self_id)
-		print ("================")
-		#print ('***', nodes, len(nodes))
+		# print ('***', nodes, len(nodes))
+	print ("============== Single Link HAC ==============")
+	for i in range(len(nodes)):
+		print (nodes[i], nodes[i].self_id)
 
 def hac_complete_link(clusters):
 	nodes = init_cluster(clusters)
 	while len(nodes) > 1:
-		max_dist, lhs, rhs = complete_link_dist(nodes)
+		max_dist, lhs, rhs, lhs_id, rhs_id = complete_link_dist(nodes)
 		#print ('+++', max_dist, lhs, rhs)
 		new_cluster = merge_cluster(nodes[lhs], nodes[rhs])
-		new_node = Node(new_cluster, str(lhs) + '-' + str(rhs), None)
+		new_node = Node(new_cluster, '('+lhs_id + '-' + rhs_id+')', None)
 		del nodes[lhs]
 		del nodes[rhs - 1]
 		nodes.append(new_node)
 		#print ('***', nodes, len(nodes))
+	print ("============== Complete Link HAC ==============")
+	for i in range(len(nodes)):
+		print (nodes[i], nodes[i].self_id)
 
 c = [
 	    [123,    312,     434,     4325,   345345],
@@ -178,9 +178,15 @@ c = [
 	    [1234,   45094,   23409,   13495,  348052],
 	    [49853,  3847,    4728,    4059,     5389]
 	]
-
+'''
+============== Single Link HAC ==============
+(<__main__.Node instance at 0x00000000080DFF88>, '(21-(31-(5-(((82-(99-(77-(70-(64-69)))))-(65-(54-(24-((12-(45-(43-(41-42))))-((13-59)-((11-(((94-98)-(18-((95-(28-97))-(44-(55-(50-56))))))-(16-89)))-(73-(7-(((85-88)-(76-(80-(27-(0-4)))))-((78-(93-(62-66)))-(67-91))))))))))))-(72-(9-(61-((49-(52-(33-(1-(26-((46-((25-96)-((2-(83-(51-63)))-(81-(3-14)))))-(15-92)))))))-(48-((20-74)-(90-((75-(87-((23-53)-(6-(58-(17-40))))))-(((10-47)-(19-36))-(((29-(30-34))-(86-(57-(22-32))))-((8-(84-(38-((68-71)-(35-39)))))-(60-(37-79)))))))))))))))))')
+============== Complete Link HAC ==============
+(<__main__.Node instance at 0x00000000080DFF08>, '((((((47-78)-(11-23))-((4-20)-(3-94)))-(((12-14)-(68-(72-77)))-((57-62)-(8-(18-92)))))-((((63-80)-(38-(73-(31-49))))-((17-50)-((44-52)-(54-79))))-(((42-58)-((29-(21-99))-(22-89)))-((84-(46-97))-((90-93)-(24-(48-69)))))))-(((((30-(26-70))-(39-(15-85)))-((7-51)-(53-59)))-(((2-45)-(19-98))-((40-76)-(16-(9-64)))))-((((35-(25-66))-((0-74)-(10-28)))-(((87-95)-(60-(61-88)))-((6-56)-(86-(27-33)))))-((((55-96)-(13-32))-((67-75)-(36-41)))-(((43-81)-(37-(5-65)))-((34-(1-82))-(71-(83-91))))))))')
+'''
 if __name__ == "__main__":
 	data =  read_from_file()
-	# center = kmeans(data,2);
-	# print center
-	hac_single_link(c)
+	for i in range(2, 11):
+		print kmeans(data, i)
+	hac_single_link(data[:100])
+	hac_complete_link(data[:100])
