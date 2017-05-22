@@ -3,7 +3,7 @@ import random as rand
 import math, csv
 
 def read_from_file():
-	with open("data.txt", 'r') as f:
+	with open("data2.txt", 'r') as f:
 		data = csv.reader(f)
 		data =  list(data)
 	return data
