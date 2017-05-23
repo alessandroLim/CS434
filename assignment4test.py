@@ -105,27 +105,31 @@ def single_link_dist(clusters, calc):
 	lhs, rhs = None, None
 	for i in range(len(clusters)):
 		for j in range(i + 1, len(clusters)):
-			tmp_dist = 999999999999999999999
-			for a in clusters[i].self_id:
-				for b in clusters[j].self_id:
-					if tmp_dist > calc[a][b]:
-						tmp_dist = calc[a][b]
+			# print '---', len(clusters[i].self_id), len(clusters[j].self_id)
+			# min_dist = 999999999999999999999
+			# for a in clusters[i].self_id:
+			# 	for b in clusters[j].self_id:
+			# 		if min_dist > calc[a][b]:
+			# 			min_dist = calc[a][b]
+			# 			lhs, rhs = i, j
+			tmp_dist = calc[clusters[i].self_id[0]][clusters[j].self_id[0]]
 			if tmp_dist < min_dist:
 				min_dist = tmp_dist
 				lhs, rhs = i, j
 	return min_dist, lhs, rhs
 
 def complete_link_dist(clusters, calc):
-	max_dist = 999999999999999999999
+	max_dist = 0
 	lhs, rhs = None, None
 	for i in range(len(clusters)):
 		for j in range(i + 1, len(clusters)):
-			tmp_dist = 0
-			for a in clusters[i].self_id:
-				for b in clusters[j].self_id:
-					if tmp_dist < calc[a][b]:
-						tmp_dist = calc[a][b]
-			if tmp_dist < max_dist:
+			# tmp_dist = 0
+			# for a in clusters[i].self_id:
+			# 	for b in clusters[j].self_id:
+			# 		if tmp_dist < calc[a][b]:
+			# 			tmp_dist = calc[a][b]
+			tmp_dist = calc[clusters[i].self_id[0]][clusters[j].self_id[0]]
+			if tmp_dist > max_dist:
 				max_dist = tmp_dist
 				lhs, rhs = i, j
 	return max_dist, lhs, rhs
@@ -191,9 +195,9 @@ c = [
 (<__main__.Node instance at 0x00000000080DFF08>, '((((((47-78)-(11-23))-((4-20)-(3-94)))-(((12-14)-(68-(72-77)))-((57-62)-(8-(18-92)))))-((((63-80)-(38-(73-(31-49))))-((17-50)-((44-52)-(54-79))))-(((42-58)-((29-(21-99))-(22-89)))-((84-(46-97))-((90-93)-(24-(48-69)))))))-(((((30-(26-70))-(39-(15-85)))-((7-51)-(53-59)))-(((2-45)-(19-98))-((40-76)-(16-(9-64)))))-((((35-(25-66))-((0-74)-(10-28)))-(((87-95)-(60-(61-88)))-((6-56)-(86-(27-33)))))-((((55-96)-(13-32))-((67-75)-(36-41)))-(((43-81)-(37-(5-65)))-((34-(1-82))-(71-(83-91))))))))')
 '''
 if __name__ == "__main__":
+	# data =  read_from_file()
+	# for i in range(2, 11):
+	# 	kmeans(data, i, 1000000)
 	data =  read_from_file()
-	for i in range(2, 11):
-		kmeans(data, i, 1000000)
-	data =  read_from_file()	
-	hac_single_link(data)
+	# hac_single_link(data)
 	hac_complete_link(data)
